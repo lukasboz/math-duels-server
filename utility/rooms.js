@@ -1,9 +1,14 @@
-const rooms = new Array();
+const rooms = new Map();
 
 exports.createRoom = (name, scope, id) => {
-    rooms.push({name: name, scope: scope, id: id});
+    rooms.set(id, {name: name, scope: scope, id: id});
 }
 
 exports.getRooms = () => {
-    return rooms.filter((room) => room.scope);
+    return Array.from(rooms.values()).filter((room) => room.scope);
+    
+}
+
+exports.deleteRoom = (id) => {
+    rooms.delete(id);
 }

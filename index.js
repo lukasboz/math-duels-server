@@ -5,6 +5,7 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require("socket.io");
 const roomUtility =  require('./utility/rooms');
+const { getRandomId } = require('./utility/randomId');
 
 
 const server = http.createServer(app);
@@ -16,10 +17,8 @@ const io = new Server(server, {
     }
 });
 
-const roomPage = io.of("/public")
-
-roomPage.on("connection", (socket) => {
-    console.log(socket.id);
+io.on("connection", (socket) => {
+    console.log(`${socket.id} has connected!`);
     socket.emit("lobbyUpdate", roomUtility.getRooms());
 
     socket.on("disconnect", () => {
@@ -29,8 +28,12 @@ roomPage.on("connection", (socket) => {
     socket.on("createRoom", (msg) => {
         console.log(`${socket.id} has created a room!`);
         console.log(`Name: ${msg.name}, Public: ${msg.scope}`)
-        roomUtility.createRoom(msg.name, msg.scope, "test");
-        roomPage.emit("lobbyUpdate", roomUtility.getRooms());
+        roomUtility.createRoom(msg.name, msg.scope, getRandomId());
+        io.emit("lobbyUpdate", roomUtility.getRooms());
+    })
+
+    socket.on("getLobbies", (callback) => {
+        callback(roomUtility.getRooms());
     })
 });
 

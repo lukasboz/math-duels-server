@@ -5,5 +5,5 @@ exports.createRoom = (name, scope, id) => {
 }
 
 exports.getRooms = () => {
-    return rooms;
+    return rooms.filter((room) => room.scope);
 }

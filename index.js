@@ -37,6 +37,14 @@ io.on("connection", (socket) => {
     })
 });
 
+const game = io.of("/game");
+
+game.on("connection", (socket) => {
+    console.log(`${socket.id} has connected to a lobby!`);
+    
+    
+})
+
 server.listen(3000, () => {
     console.log("Server is ready!!!!!");
 })

@@ -27,8 +27,9 @@ io.on("connection", (socket) => {
 
     socket.on("createRoom", (msg) => {
         console.log(`${socket.id} has created a room!`);
-        console.log(`Name: ${msg.name}, Public: ${msg.scope}`)
-        roomUtility.createRoom(msg.name, msg.scope, getRandomId());
+        const ID = getRandomId();
+        console.log(`Name: ${msg.name}, ID: ${ID}`)
+        roomUtility.createRoom(msg.name, msg.scope, ID);
         io.emit("lobbyUpdate", roomUtility.getRooms());
     })
 
@@ -39,9 +40,24 @@ io.on("connection", (socket) => {
 
 const game = io.of("/game");
 
+game.use((socket, next) => {
+    const room = socket.handshake.auth.gameId;
+    console.log(room);
+    if (roomUtility.hasRoom(room)) {
+        next();
+    }
+    else {
+        next(new Error("Room does not exist."));
+    }
+})
+
 game.on("connection", (socket) => {
+    const room = socket.handshake.auth.gameId;
     console.log(`${socket.id} has connected to a lobby!`);
-    
+
+    socket.on("disconnect", () => {
+        console.log(`${socket.id} has disconnected from a lobby.`);
+    })
     
 })
 
